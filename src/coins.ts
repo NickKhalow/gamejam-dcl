@@ -1,6 +1,5 @@
 import { ColliderLayer, engine, Entity, GltfContainer, MapComponentDefinition, MapResult, ISchema, Schemas, Transform } from "@dcl/sdk/ecs";
 import { syncEntity } from '@dcl/sdk/network'
-import { playersRecord } from ".";
 
 const src = "assets/asset-packs/diamond_-_yellow/diamond_pattern_yellow.glb"
 const defaultRadius = 1;
@@ -22,12 +21,7 @@ export type CoinsRecordSchema = MapResult<{
 export const CoinsRecordComponent = engine.defineComponent(
     "coinsRecordComponent",
     {
-        collectedCount: Schemas.Array(
-            Schemas.Map({
-                address: Schemas.String,
-                record: Schemas.Number
-            })
-        )
+        collectedCountJson: Schemas.String
     }
 )
 
@@ -41,11 +35,4 @@ export function newCoin(): Entity {
     CoinComponent.create(entity, { radius: defaultRadius })
     syncEntity(entity, [Transform.componentId, CoinComponent.componentId])
     return entity
-}
-
-export function resetRecords() {
-    for (const i of playersRecord.collectedCount) {
-        i.record = 0
-    }
-    playersRecord.collectedCount = [...playersRecord.collectedCount]
 }

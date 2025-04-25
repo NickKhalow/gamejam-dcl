@@ -3,12 +3,12 @@ import { engine } from '@dcl/sdk/ecs'
 import { newArea } from './area'
 import { spawnCoinsSystem } from './systems/spawn-coins-system';
 import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
-import { CoinsRecordComponent, CoinsRecordSchema, newCoin } from './coins';
+import { newCoin } from './coins';
 import { collectCoinsSystem } from './systems/collect-coins-system';
 import { displayCoinsRecordSystem } from './systems/display-coins-record-system';
 import { uiMenu } from './game.ui';
-import { syncEntity } from '@dcl/sdk/network';
 import { createTimer, timerCountingSystem } from './timers/timer';
+import { newSyncPlayerRecord, playersRecordsProxy } from './records';
 
 export const roundTime: number = 30
 
@@ -17,17 +17,11 @@ export enum EnumId {
     TIMER = 2,
 }
 
-export let playersRecord: CoinsRecordSchema
-
 export function main() {
     console.log("Main function is called")
 
-    const area = newArea();
-
-    const recordEntity = engine.addEntity();
-    playersRecord = CoinsRecordComponent.create(recordEntity)
-    syncEntity(recordEntity, [CoinsRecordComponent.componentId], EnumId.RECORD)
-
+    const area = newArea()
+    playersRecordsProxy.assignProxy(newSyncPlayerRecord())
     createTimer(roundTime)
 
     engine.addSystem(

@@ -1,15 +1,12 @@
-import { engine, PlayerIdentityData } from "@dcl/sdk/ecs";
 import { getPlayer } from '@dcl/sdk/src/players'
 import { assignItems, RecordItem } from "../game.ui";
-import { CoinsRecordComponent } from "../coins";
-import { playersRecord } from "..";
-import { fail } from "../utils";
+import { playersRecordsProxy } from '../records';
 
 export function displayCoinsRecordSystem() {
     const output: RecordItem[] = []
-    playersRecord.collectedCount.forEach((i) => {
-        const name: string = getPlayer({ userId: i.address })?.name ?? "cannot get name"
-        output.push({ address: i.address, name, count: i.record })
-    });
+    for (const [userId, record] of playersRecordsProxy) {
+        const name: string = getPlayer({ userId })?.name ?? "cannot get name"
+        output.push({ address: userId, name, count: record })
+    }
     assignItems(output)
 }

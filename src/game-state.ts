@@ -1,4 +1,4 @@
-import { resetRecords } from "./coins"
+import { playersRecordsProxy } from "./records"
 import { resetTimer } from "./timers/timer"
 
 type GameState = {
@@ -8,5 +8,5 @@ type GameState = {
 
 export function restartGame() {
     resetTimer()
-    resetRecords()
+    playersRecordsProxy.reset()
 }
