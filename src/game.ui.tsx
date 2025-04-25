@@ -1,9 +1,13 @@
+import { engine } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { Button, UiEntity } from '@dcl/sdk/react-ecs'
+import { currentTimer, resetTimer, TimerComponent } from './timers/timer'
+import { restartGame } from './game-state'
 
-let items: ReactEcs.JSX.Element[] = elementsFrom([{ name: "none", count: 10 }])
+let items: ReactEcs.JSX.Element[] = elementsFrom([{ address: "", name: "none", count: 10 }])
 
 export type RecordItem = {
+    address: string,
     name: string,
     count: number
 }
@@ -26,9 +30,46 @@ export const uiMenu = () => (
         }}
         uiBackground={{ color }}
     >
+        <UiEntity
+            uiTransform={{
+                width: 200,
+                height: 60
+            }}
+            uiText={{
+                value: secondsLeftText(),
+                fontSize: 20
+            }}
+            uiBackground={{
+                color: color
+            }}
+        />
+        {restartTimerButton()}
         {items}
     </UiEntity>
 )
+
+function secondsLeftText(): string {
+    for (const [_, t] of engine.getEntitiesWith(TimerComponent)) {
+        if (!t.countingDown) return "Time over"
+        return "Seconds left: " + t.secondsLeft.toFixed(0)
+    }
+    return "Time over"
+}
+
+export function restartTimerButton(): ReactEcs.JSX.Element | null {
+    const t = currentTimer()
+    if (t === null || t.countingDown)
+        return null
+
+    return (<Button
+        value='Restart'
+        fontSize={20}
+        uiTransform={{ width: 100, height: 30, margin: 6 }}
+        onMouseDown={restartGame}
+        color={Color4.White()}
+        uiBackground={{color}}
+    />)
+}
 
 export function assignItems(recordItems: ReadonlyArray<RecordItem>): void {
     items = elementsFrom(recordItems)
@@ -40,7 +81,7 @@ function elementsFrom(items: ReadonlyArray<RecordItem>): ReactEcs.JSX.Element[] 
 
     return items.map(i =>
         <UiEntity
-            key={i.name}
+            key={i.address}
             uiTransform={{
                 width: 200, height: 40,
                 margin: { left: 10, right: 10, top: 5, bottom: 5 }

@@ -8,8 +8,8 @@ import { fail } from "../utils";
 export function displayCoinsRecordSystem() {
     const output: RecordItem[] = []
     playersRecord.collectedCount.forEach((i) => {
-        const name: string = getPlayer({ userId: i.address })?.name ?? fail("cannot get name")
-        output.push({ name, count: i.record })
+        const name: string = getPlayer({ userId: i.address })?.name ?? "cannot get name"
+        output.push({ address: i.address, name, count: i.record })
     });
     assignItems(output)
 }

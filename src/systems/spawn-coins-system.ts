@@ -1,12 +1,13 @@
 import { engine, Entity, Transform } from "@dcl/sdk/ecs";
 import { SpawnArea } from "../area";
 import { newSystem } from "./systems-util";
+import { currentTimer, currentTimerOrFail } from "../timers/timer";
 
 //TODO add prefab
 export function spawnCoinsSystem(
     ctx: {
         spawnArea: SpawnArea,
-        newCoinConstructor: () => Entity, 
+        newCoinConstructor: () => Entity,
         delaySeconds: number
     }
 ) {
@@ -16,6 +17,10 @@ export function spawnCoinsSystem(
     return newSystem(
         ctx,
         (ctx, dt) => {
+            const timer = currentTimerOrFail()
+            if (!timer.countingDown)
+                return
+
             current -= dt
 
             if (current <= 0) {
